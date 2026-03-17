@@ -1,41 +1,41 @@
-# Smart Travel Timing (SATR MVP)
+# Smart Travel Timing (MVP)
 
-This project now implements a stronger prototype of your original idea using the **Smart Arrival Time Recommendation (SATR)** approach.
+A tiny prototype for your idea: **"leave at the right time so you arrive when the place opens."**
 
-## Is this the same thing we built before?
+## What it does
 
-**Partly.**
+Given:
+- destination name
+- opening time (`HH:MM`, 24-hour format)
+- travel duration (minutes)
 
-- Before: a basic calculator that said, “if opening is 10:00 and travel is 35 min, leave at 9:25.”
-- Now: a scoring-based recommender that compares multiple candidate arrival windows and picks the best one by balancing:
-  - predicted travel time,
-  - schedule deviation from the user’s preferred arrival,
-  - network desirability via **Promotion Intensity Signal (PIS)**.
+It returns:
+- suggested departure datetime
+- expected arrival datetime
 
-So this version is much closer to your paper’s methodology (Section 3.2 and 3.3 style logic).
-
-## Core model
-
-For each candidate arrival time, we compute:
-
-- `PIS = -alpha * congestion_increase + beta * reliability`, clamped to `[-1, 1]`
-- `SATR score = -(w1 * travel_time + w2 * schedule_deviation) + w3 * PIS`
-
-The selected recommendation is the candidate with maximum SATR score.
-
-## Run the CLI demo
+## Run
 
 ```bash
 python smart_travel_timing.py
 ```
 
-You will provide:
+Example input:
 
-- destination
-- preferred arrival datetime
-- three candidate windows in `travel,congestion,reliability` format
+```text
+Destination: City Mall
+Opening time (HH:MM): 10:00
+Travel duration in minutes: 35
+```
 
-The script outputs recommended arrival/departure plus PIS and total SATR score.
+Example output:
+
+```text
+Destination: City Mall
+Opening time: 2026-01-10 10:00
+Travel duration: 35 minutes
+Suggested departure: 2026-01-10 09:25
+Expected arrival: 2026-01-10 10:00
+```
 
 ## Run tests
 
@@ -43,9 +43,9 @@ The script outputs recommended arrival/departure plus PIS and total SATR score.
 python -m unittest -v
 ```
 
-## Next steps
+## Next steps toward a real product
 
-- Pull candidate windows from map APIs (historical + real-time ETA).
-- Add route choice alongside time choice.
-- Calibrate user-specific weights automatically.
-- Add compliance simulation to estimate network-level delay reduction.
+- Replace manual travel duration with map API traffic estimates.
+- Handle complex opening schedules (multiple windows, weekends, holidays).
+- Add user preferences (arrive early, parking buffer, etc.).
+- Wrap this logic as a lightweight mobile/web plugin layer.
